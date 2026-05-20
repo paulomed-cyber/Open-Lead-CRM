@@ -1,0 +1,56 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model Lead {
+  id             String        @id @default(cuid())
+  name           String
+  company        String?
+  email          String?
+  phone          String?
+  source         String        @default("Other")
+  status         String        @default("New Lead")
+  estimatedValue Float?        @default(0)
+  notes          String?
+  nextFollowUpAt DateTime?
+  
+  // Marketing Attribution
+  utmSource      String?
+  utmMedium      String?
+  utmCampaign    String?
+  utmContent     String?
+  utmTerm        String?
+  gclid          String?
+  fbclid         String?
+
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+
+  tasks          Task[]
+  interactions   Interaction[]
+}
+
+model Task {
+  id        String   @id @default(cuid())
+  leadId    String
+  lead      Lead     @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  title     String
+  type      String   @default("Note")
+  dueDate   DateTime
+  completed Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Interaction {
+  id          String   @id @default(cuid())
+  leadId      String
+  lead        Lead     @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  type        String
+  description String
+  createdAt   DateTime @default(now())
+}
